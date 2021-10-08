@@ -147,7 +147,7 @@ void loop() {
     byte button_on = (PINB >> 3 & B00001000 >> 3); // sama dengan digitalRead(on_pin);
     byte button_off = (PINB & B00000001); // sama dengan digitalRead(off_pin);
     
-    // jika nilai button_on = 1 dan button_off = 0 (tidak ditekan) dan led sedang mati
+    // jika nilai button_on = 1 dan button_off = 0 (tidak ditekan)
     if (button_on == 1 && button_off == 0) {
       PORTD |= B00000100; // nyalakan indicator led
     }
@@ -175,7 +175,6 @@ void loop() {
 // ISR for port B
 ISR (PCINT0_vect) {
     if (check_state == false) {        
-        //sleep_disable();    // Stop low power mode
         cli();              // Stop interrupts for a while
         check_state = true;
     }
