@@ -11,6 +11,7 @@ void setup() {
     /* ------------------------------------------------------ INFO ----------------------------------------------------
     info tambahan mengenai interrupt: https://thewanderingengineer.com/2014/08/11/arduino-pin-change-interrupts/
     info tambahan mengenai register: https://youtu.be/nZKLHvEdlGk, https://electronoobs.com/eng_arduino_tut130.php
+    referensi tentang sleep mode: https://www.youtube.com/watch?v=urLSDi7SD8M
     
     langkah-langkah mengaktifkan interrupt:
     1. Non-aktifkan / stop interrupt sebelum mengatur interrupt menjadi aktif dengan perintah "cli()"
