@@ -9,13 +9,13 @@ unsigned long last_millis = 0;
 
 void setup() {
     /* ------------------------------------------------------ INFO ----------------------------------------------------
-    info tambahan mengenai interrupt: https://thewanderingengineer.com/2014/08/11/arduino-pin-change-interrupts/
     info tambahan mengenai register: https://youtu.be/nZKLHvEdlGk, https://electronoobs.com/eng_arduino_tut130.php
-    referensi tentang sleep mode: https://www.youtube.com/watch?v=urLSDi7SD8M
+    referensi mengenai interrupt: https://thewanderingengineer.com/2014/08/11/arduino-pin-change-interrupts/
+    referensi tentang sleep mode: https://www.youtube.com/watch?v=urLSDi7SD8M, https://electronoobs.com/eng_arduino_tut129.php
     
     langkah-langkah mengaktifkan interrupt:
     1. Non-aktifkan / stop interrupt sebelum mengatur interrupt menjadi aktif dengan perintah "cli()"
-    2. Atur port dan pin di port sebagai interrupt sesuai keperluan, seperti langkah berikut ini:
+    2. Atur port dan pin di port yang dipilih sebagai interrupt sesuai keperluan, seperti langkah berikut ini:
         1. Tentukan port mana yang akan dijadikan sebagai interrupt --> PCICR
         2. Tentukan pin mana di port yang sudah dipilih sebagai interrupt --> PCMSK --> 0=PORT B, 1=PORT C, 2=PORT D
         - jika port b yang akan diaktifkan sebagai interrupt maka: 
@@ -33,7 +33,9 @@ void setup() {
 
     Untuk menggunakan perintah "cli()" dan "sei()" harus menambahkan librari <avr/interrupt.h> di header. tetapi ketika dicoba
     tanpa librari tersebut ternyata juga bisa. :confuse
-    
+
+    Proses interrupt ini seperti mode CHANGE jika menggunakan attachInterrupt, akan ke trigger jika statusnya LOW ataupun HIGH
+        
     ---------------------------------------------- PIN CHANGE INTERRUPT ---------------------------------------------------*/    
     cli(); // stop all interrupt
 
@@ -149,7 +151,7 @@ void loop() {
     byte button_on = (PINB >> 3 & B00001000 >> 3); // sama dengan digitalRead(on_pin);
     byte button_off = (PINB & B00000001); // sama dengan digitalRead(off_pin);
     
-    // jika nilai button_on = 1 dan button_off = 0 (tidak ditekan)
+    // jika nilai button_on = 1 dan button_off = 0 (tidak ditekan) 
     if (button_on == 1 && button_off == 0) {
       PORTD |= B00000100; // nyalakan indicator led
     }
@@ -177,6 +179,7 @@ void loop() {
 // ISR for port B
 ISR (PCINT0_vect) {
     if (check_state == false) {        
+        //sleep_disable();    // Stop low power mode
         cli();              // Stop interrupts for a while
         check_state = true;
     }
