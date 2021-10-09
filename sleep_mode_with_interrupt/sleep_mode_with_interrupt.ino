@@ -79,8 +79,8 @@ void setup() {
     // menggunakan register akan mempercepat proses eksekusi program dan memperkecil penggunaan memori
     // dari pada menggunakan function seperti pinMode atau digitalWrite
     
-    DDRB &= !B00000001; // sama dengan DDRB = DDRB & !B00000001; --> DDRB = B11111110 --> pinMode(on_pin, INPUT);  --> bisa dihapus, krn standard pin arduino = INPUT
-    DDRB &= !B00001000; // sama dengan DDRB = DDRB & !B00001000; --> DDRB = B11110111 --> pinMode(off_pin, INPUT); --> bisa dihapus, krn standard pin arduino = INPUT       
+    DDRB &= !B00000001; // sama dengan DDRB = ~(DDRB & B00000001); --> DDRB = B11111110 --> pinMode(on_pin, INPUT);  --> bisa dihapus, krn standard pin arduino = INPUT
+    DDRB &= !B00001000; // sama dengan DDRB = ~(DDRB & B00001000); --> DDRB = B11110111 --> pinMode(off_pin, INPUT); --> bisa dihapus, krn standard pin arduino = INPUT
 
     // mengaktifkan bit ke3 di port D (PD2 / pin 4 di atmega / pin 2 di arduino) sebagai OUTPUT
     DDRD |= B00000100; // --> pinMode(indicator_pin, OUTPUT);
