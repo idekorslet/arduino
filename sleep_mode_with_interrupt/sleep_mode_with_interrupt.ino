@@ -59,8 +59,8 @@ void setup() {
     
     // DDRB &= !B00000001; // Mengaktifkan pin 8 di arduino atau pin 14 di chip atmega (PORT B) 
     // DDRB &= !B00001000; // Mengaktifkan pin 11 di arduino atau pin 17 di chip atmega (PORT B)
-    // Jika nilainya 0, berarti digunakan sebagai output, sama seperti ini: pinMode(8, OUTPUT)
-    // Jika nilainya 1, berarti digunakan sebagai input, sama seperti ini: pinMode(8, INPUT)
+    // Jika nilainya 0, berarti digunakan sebagai output, sama seperti ini: pinMode(8, INPUT)
+    // Jika nilainya 1, berarti digunakan sebagai input, sama seperti ini: pinMode(8, OUTPUT)
 
     // Note: 
     // Nilai awal pin 8 adalah b00000001
