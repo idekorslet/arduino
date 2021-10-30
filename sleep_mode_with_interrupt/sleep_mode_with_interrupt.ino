@@ -17,6 +17,10 @@ void setup() {
     1. Non-aktifkan / stop interrupt sebelum mengatur interrupt menjadi aktif dengan perintah "cli()"
     2. Atur port dan pin di port yang dipilih sebagai interrupt sesuai keperluan, seperti langkah berikut ini:
         1. Tentukan port mana yang akan dijadikan sebagai interrupt --> PCICR
+            PCICR |= 0b00000001;    // turn on port b
+            PCICR |= 0b00000010;    // turn on port c
+            PCICR |= 0b00000100;    // turn on port d
+            PCICR |= 0b00000111;    // turn on all port
         2. Tentukan pin mana di port yang sudah dipilih sebagai interrupt --> PCMSK --> 0=PORT B, 1=PORT C, 2=PORT D
         - jika port b yang akan diaktifkan sebagai interrupt maka: 
             # PCMSK0 --> port b
