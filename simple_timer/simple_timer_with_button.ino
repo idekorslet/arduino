@@ -53,6 +53,8 @@ byte detik = 0;
 
 byte _time[3];      // variabel array, jika index = 0 --> jam, index = 1 --> menit, index = 2 --> detik
 byte temp_time = 0; // variabel temporary / variabel bantu
+byte last_value = 0;
+byte last_index = 0;
 
 unsigned long last_blink_time = 0;
 unsigned long last_millis_timer = 0;
@@ -393,6 +395,9 @@ void loop() {
                         EEPROM.write(MINUTE_ADDRESS, _time[1]);
                         EEPROM.write(SECOND_ADDRESS, _time[2]);
                     }
+                    // jika di cancel, maka kembalikan nilai variabel _time[cursor_index] menjadi nilai sebelumnya krn tidak jadi disimpan
+                    else 
+                        _time[last_index] = last_value;
                     
                     // kembali ke page index sebelumnya dan set cursor index menjadi 0
                     page_index--;
@@ -403,6 +408,8 @@ void loop() {
                     if (!blinking) {
                         temp_time = _time[cursor_index]; // load nilai di variabel array ke temp_time
                         blinking = true;
+                        last_value = temp_time;          // simpan nilai terakhir
+                        last_index = cursor_index;       // simpan index terakhir
                     }
                     else
                         blinking = false;
