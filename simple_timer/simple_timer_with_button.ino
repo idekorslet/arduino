@@ -56,7 +56,6 @@ byte temp_time = 0; // variabel temporary / variabel bantu
 
 unsigned long last_blink_time = 0;
 unsigned long last_millis_timer = 0;
-// unsigned long last_time_button_pressed = 0;
 int elapsed_time = 0;  // sisa kelebihan waktu setelah 1 detik
 
 void setup() {
