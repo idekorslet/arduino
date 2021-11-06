@@ -11,6 +11,9 @@ This code is a simple timer / countdown timer using arduino and OLED display (12
 For the simple_timer.ino file using a rotary encoder as a menu controller / to select the menu, while the simple_timer_with_button.ino file
 use buttons to control/select the menu. Using a rotary encoder does not give the desired result, so I prefer to use the button.
 
+how to use function / method drawRectangleCursor:
+![rectalngle_cursor](https://github.com/idekorslet/arduino/blob/main/simple_timer/rectangle_cursor.JPG)
+
 Notes:
 If something goes wrong with this code, it is at your own risk.
 (using translator)
