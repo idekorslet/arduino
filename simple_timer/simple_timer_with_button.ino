@@ -56,6 +56,7 @@ byte temp_time = 0; // variabel temporary / variabel bantu
 
 unsigned long last_blink_time = 0;
 unsigned long last_millis_timer = 0;
+// unsigned long last_time_button_pressed = 0;
 int elapsed_time = 0;  // sisa kelebihan waktu setelah 1 detik
 
 void setup() {
@@ -280,7 +281,9 @@ void showMenu() {
 bool checkButtonState(bool btn_name, bool &last_button_state) {
     bool result = false;
 
+    // jika btn_name == LOW, berarti tombol sedang ditekan
     if (btn_name == LOW) {
+        // jika status tombol sebelumnya = HIGH berarti sebelumnya tombol tidak ditekan
         if (last_button_state == HIGH) result = true;
 
         last_button_state = LOW;
