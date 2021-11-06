@@ -1,4 +1,4 @@
-Kodingan ini adalah timer sederhana/penghitung waktu mundur (simple countdown timer) menggunakan arduino dan OLED display (128x32).
+Kodingan ini adalah timer sederhana / penghitung waktu mundur menggunakan arduino dan OLED display (128 x 32).
 Untuk file simple_timer.ino menggunakan rotary encoder sebagai pengontrol menu / untuk memilih menu, sedangkan file simple_timer_with_button.ino
 menggunakan tombol untuk mengontrol / memilih menu. Penggunaan rotary encoder terkadang tidak pas hasil yang diinginkan, jadi saya lebih prefer menggunakan tombol.
 
