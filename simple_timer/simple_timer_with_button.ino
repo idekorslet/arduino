@@ -28,9 +28,9 @@ byte max_cursor_index = 1;
 
 // --------------------- VARIABEL UNTUK TOMBOL  --------------------------------
 // status tombol normally high karena diatur INPUT_PULLUP, ketika ditekan maka nilai outputnya = LOW
-#define ok_button 2
-#define left_button 3
-#define right_button 4
+#define left_button 2
+#define right_button 3
+#define ok_button 4
 
 #define relay_pin 13
 
@@ -58,6 +58,7 @@ byte last_index = 0;
 
 unsigned long last_blink_time = 0;
 unsigned long last_millis_timer = 0;
+unsigned long last_time_button_release = 0;
 int elapsed_time = 0;  // sisa kelebihan waktu setelah 1 detik
 
 void setup() {
@@ -269,7 +270,7 @@ void showMenu() {
                 last_blink_time = millis();
             }
             
-            // jika blink tidak aktif maka tidak perlu ada efek kedip kotak kursornya
+            // jika blink tidak aktif maka tidak perlu ada efek kedip kotak kursornya (selalu tampilkan kursornya)
             if (!blinking) showCursor = true;
             
             if (showCursor) drawRectangleCursor(cursor_row_pos, _x, _y, _z);
@@ -281,16 +282,22 @@ void showMenu() {
 
 bool checkButtonState(bool btn_name, bool &last_button_state) {
     bool result = false;
-
+    
     // jika btn_name == LOW, berarti tombol sedang ditekan
     if (btn_name == LOW) {
         // jika status tombol sebelumnya = HIGH berarti sebelumnya tombol tidak ditekan
-        if (last_button_state == HIGH) result = true;
+        if (last_button_state == HIGH) 
+            result = true;
+        else {
+            if (millis() - last_time_button_release >= 2000)  result = true;
+        }
 
         last_button_state = LOW;
     }
-    else  
+    else {
+        result = false;
         last_button_state = HIGH;
+    }
     
     return result;
 }
@@ -306,6 +313,10 @@ void loop() {
     bool ok_button_pressed = checkButtonState(ok_button_state, last_ok_button);
     bool left_button_pressed = checkButtonState(left_button_state, last_left_button);
     bool right_button_pressed = checkButtonState(right_button_state, last_right_button);
+
+    if (left_button_state == 1 && right_button_state == 1 && ok_button_state == 1) {
+        last_time_button_release = millis();
+    }
 
     // jika tombol kanan / up ditekan
     if (right_button_pressed) {
@@ -390,26 +401,38 @@ void loop() {
                 if (cursor_index == 3 || cursor_index == 4) {                    
                     // jika kursor index = 3, berarti tombol ditekan diposisi menu save (simpan data)
                     // jika sebelumnya blinking (mengatur nilai timer) selanjutnya simpan nilai timer terbaru tersebut ke EEPROM
-                    if (cursor_index == 3) {
-                        EEPROM.write(HOUR_ADDRESS, _time[0]);
-                        EEPROM.write(MINUTE_ADDRESS, _time[1]);
-                        EEPROM.write(SECOND_ADDRESS, _time[2]);
+                    // sebelum disimpan pastikan dulu nilai yang diatur tidak semuanya = 0
+                    bool valid = false;
+
+                    jam   = _time[0];
+                    menit = _time[1];
+                    detik = _time[2];
+
+                    // jika waktu ada yang lebih dari 0 atau menu cancel dipilih, maka valid = true
+                    if (jam > 0 || menit > 0 || detik > 0 || cursor_index == 4) valid = true;
+
+                    if (valid) {
+                        if (cursor_index == 3) {
+                            EEPROM.write(HOUR_ADDRESS, jam);
+                            EEPROM.write(MINUTE_ADDRESS, menit);
+                            EEPROM.write(SECOND_ADDRESS, detik);
+                        }
+                        // jika di cancel, maka kembalikan nilai variabel _time[cursor_index] menjadi nilai sebelumnya krn tidak jadi disimpan
+                        else 
+                            _time[last_index] = last_value;
+                        
+                        // kembali ke page index sebelumnya dan set cursor index menjadi 0
+                        page_index--;
+                        cursor_index = 0;
                     }
-                    // jika di cancel, maka kembalikan nilai variabel _time[cursor_index] menjadi nilai sebelumnya krn tidak jadi disimpan
-                    else 
-                        _time[last_index] = last_value;
-                    
-                    // kembali ke page index sebelumnya dan set cursor index menjadi 0
-                    page_index--;
-                    cursor_index = 0;
                 }
                 else {
                     // jika tombol ditekan dan posisi kursor di timer jam, menit ataupun detik, berarti mau mengatur timer
                     if (!blinking) {
                         temp_time = _time[cursor_index]; // load nilai di variabel array ke temp_time
-                        blinking = true;
                         last_value = temp_time;          // simpan nilai terakhir
                         last_index = cursor_index;       // simpan index terakhir
+                        blinking = true;
                     }
                     else
                         blinking = false;
