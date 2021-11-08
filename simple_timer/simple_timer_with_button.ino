@@ -53,13 +53,17 @@ byte detik = 0;
 
 byte _time[3];      // variabel array, jika index = 0 --> jam, index = 1 --> menit, index = 2 --> detik
 byte temp_time = 0; // variabel temporary / variabel bantu
-byte last_value = 0;
-byte last_index = 0;
 
 unsigned long last_blink_time = 0;
 unsigned long last_millis_timer = 0;
 unsigned long last_time_button_release = 0;
 int elapsed_time = 0;  // sisa kelebihan waktu setelah 1 detik
+
+void readTimeFromEEPROM() {
+    _time[0] = EEPROM.read(HOUR_ADDRESS);
+    _time[1] = EEPROM.read(MINUTE_ADDRESS);
+    _time[2] = EEPROM.read(SECOND_ADDRESS);
+}
 
 void setup() {
     // atur pin sebagai INPUT / OUTPUT
@@ -70,11 +74,8 @@ void setup() {
 
     // atur output menjadi low ketika up
     digitalWrite(relay_pin, LOW);
-
     // load data timer yang tersimpan di EEPROM dan simpan ke variabel array
-    _time[0] = EEPROM.read(HOUR_ADDRESS);
-    _time[1] = EEPROM.read(MINUTE_ADDRESS);
-    _time[2] = EEPROM.read(SECOND_ADDRESS);
+    readTimeFromEEPROM();
 
     // ----------------------------------- OLED Setup ----------------------------------------
     if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -201,14 +202,18 @@ void runAndShowTimer() {
     display.display();
 }
 
+void readTime() {
+    jam   = _time[0];
+    menit = _time[1];
+    detik = _time[2];
+}
+
 void updateAndShowTimer() {
     char timer_char[9];
 
     // jika timer tidak aktif, maka nilai jam, menit, detik hanya di load untuk sekedar ditampilkan, bukan untuk dikurangi
     if (!timer_active) {
-        jam   = _time[0];
-        menit = _time[1];
-        detik = _time[2];
+        readTime();
     }
     else {
         if (millis() - last_millis_timer >= 1000) {
@@ -288,6 +293,7 @@ bool checkButtonState(bool btn_name, bool &last_button_state) {
         // jika status tombol sebelumnya = HIGH berarti sebelumnya tombol tidak ditekan
         if (last_button_state == HIGH) 
             result = true;
+        // jika status tombol sebelumnya = LOW berarti tombol sedang ditekan dan ditahan
         else {
             if (millis() - last_time_button_release >= 2000)  result = true;
         }
@@ -382,15 +388,13 @@ void loop() {
             if (page_index == 0) {
                 // masuk ke page index selanjutnya jika kursor index = 0 atau di menu setting
                 if (cursor_index == 0) 
-                    page_index++; 
+                    page_index++;
                 else {
                     // cursor index = 1 --> kursor fokus ke menu START, maka aktifkan timer
                     timer_active = true;
 
-                    // load nilai timer yang tersimpan di EEPROM
-                    jam   = _time[0];
-                    menit = _time[1];
-                    detik = _time[2];
+                    // load nilai timer yang tersimpan di variabel array
+                    readTime();
 
                     last_millis_timer = millis();
                     cursor_index = 0;
@@ -403,10 +407,7 @@ void loop() {
                     // jika sebelumnya blinking (mengatur nilai timer) selanjutnya simpan nilai timer terbaru tersebut ke EEPROM
                     // sebelum disimpan pastikan dulu nilai yang diatur tidak semuanya = 0
                     bool valid = false;
-
-                    jam   = _time[0];
-                    menit = _time[1];
-                    detik = _time[2];
+                    readTime();
 
                     // jika waktu ada yang lebih dari 0 atau menu cancel dipilih, maka valid = true
                     if (jam > 0 || menit > 0 || detik > 0 || cursor_index == 4) valid = true;
@@ -417,9 +418,9 @@ void loop() {
                             EEPROM.write(MINUTE_ADDRESS, menit);
                             EEPROM.write(SECOND_ADDRESS, detik);
                         }
-                        // jika di cancel, maka kembalikan nilai variabel _time[cursor_index] menjadi nilai sebelumnya krn tidak jadi disimpan
-                        else 
-                            _time[last_index] = last_value;
+                        // jika di cancel maka kembalikan semua nilai timer ke asal
+                        else
+                            readTimeFromEEPROM();
                         
                         // kembali ke page index sebelumnya dan set cursor index menjadi 0
                         page_index--;
@@ -430,11 +431,10 @@ void loop() {
                     // jika tombol ditekan dan posisi kursor di timer jam, menit ataupun detik, berarti mau mengatur timer
                     if (!blinking) {
                         temp_time = _time[cursor_index]; // load nilai di variabel array ke temp_time
-                        last_value = temp_time;          // simpan nilai terakhir
-                        last_index = cursor_index;       // simpan index terakhir
                         blinking = true;
                     }
-                    else
+                    // jika tombol ditekan dan blinking = true, berarti sudah selesai mengatur waktu yang dipilih
+                    else 
                         blinking = false;
                 }                        
             }
