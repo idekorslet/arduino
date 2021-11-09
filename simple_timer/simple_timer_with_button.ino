@@ -294,8 +294,11 @@ bool checkButtonState(bool btn_name, bool &last_button_state) {
         if (last_button_state == HIGH) 
             result = true;
         // jika status tombol sebelumnya = LOW berarti tombol sedang ditekan dan ditahan
+        // berfungsi untuk mengatur nilai timer lebih cepat hanya dengan tekan dan tahan tombol daripada pencet tombol satu-satu
+        // untuk mengubah nilai timer ketika mengatur timer
         else {
-            if (millis() - last_time_button_release >= 2000)  result = true;
+            // jika lebih dari 2 detik tombol ditekan dan ditahan dan blinking = true (sedang mengatur waktu)
+            if (millis() - last_time_button_release >= 2000 && blinking) result = true;
         }
 
         last_button_state = LOW;
